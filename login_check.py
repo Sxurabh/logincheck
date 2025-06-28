@@ -43,12 +43,13 @@ def send_email(subject, body):
 
 # --- Selenium setup ---
 options = Options()
-options.binary_location = "/usr/bin/chromium-browser"   # point at the Chromium binary
-options.add_argument("--headless")
+options.binary_location = "/usr/bin/chromium-browser"    # Ubuntu’s Chromium binary
+options.add_argument("--headless=new")
+options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--remote-debugging-port=9222")
 
-# use webdriver-manager to pull down the matching Chromedriver
 service = Service(ChromeDriverManager().install())
 driver  = webdriver.Chrome(service=service, options=options)
 wait    = WebDriverWait(driver, 10)
@@ -57,12 +58,10 @@ try:
     driver.get(LOGIN_URL)
     print(f"Opened {LOGIN_URL}")
 
-    wait.until(EC.visibility_of_element_located((By.ID, USERNAME_FIELD_ID)))\
-        .send_keys(USERNAME)
+    wait.until(EC.visibility_of_element_located((By.ID, USERNAME_FIELD_ID))).send_keys(USERNAME)
     print("Entered username")
 
-    wait.until(EC.visibility_of_element_located((By.ID, PASSWORD_FIELD_ID)))\
-        .send_keys(PASSWORD)
+    wait.until(EC.visibility_of_element_located((By.ID, PASSWORD_FIELD_ID))).send_keys(PASSWORD)
     print("Entered password")
 
     wait.until(EC.element_to_be_clickable((By.ID, LOGIN_BUTTON_ID))).click()
