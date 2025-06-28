@@ -4,24 +4,51 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
+import smtplib
+from email.mime.text import MIMEText
 import time
+import os
 
-# Configuration variables (replace with your actual values)
+# Configuration variables
 LOGIN_URL = "https://www.himalayanuniversity.com/student/student_login.php"
-USERNAME = "5045101012180086"
-PASSWORD = "16071998"
+USERNAME = os.getenv("LOGIN_USERNAME")  # Use GitHub Secrets
+PASSWORD = os.getenv("LOGIN_PASSWORD")  # Use GitHub Secrets
 USERNAME_FIELD_ID = "frm_registration_no"
 PASSWORD_FIELD_ID = "frm_dob"
 LOGIN_BUTTON_ID = "div_load"
 EXPECTED_URL = "https://www.himalayanuniversity.com/student/index.php"
 
+# Email configuration
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
+RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL")
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+
+def send_email(subject, body):
+    """Send an email notification."""
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = SENDER_EMAIL
+    msg["To"] = RECEIVER_EMAIL
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, msg.as_string())
+        print("Email notification sent successfully.")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 # Set up Chrome options for headless mode
 options = Options()
 options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 
-# Initialize the Chrome driver with headless options
-driver = webdriver.Chrome(options=options)  # Ensure ChromeDriver is in your PATH
-wait = WebDriverWait(driver, 10)  # Explicit wait with a 10-second timeout
+# Initialize the Chrome driver
+driver = webdriver.Chrome(options=options)
+wait = WebDriverWait(driver, 10)
 
 try:
     # Navigate to the login page
@@ -48,14 +75,18 @@ try:
         wait.until(EC.url_to_be(EXPECTED_URL))
         print("Login successful!")
     except TimeoutException:
-        print("Login failed: did not redirect to the expected URL within the time limit.")
+        error_message = "Login failed: did not redirect to the expected URL within the time limit."
+        print(error_message)
+        send_email("Login Failure Alert", error_message)
 
 except TimeoutException:
-    print("Timeout: Element not found or page took too long to load.")
+    error_message = "Timeout: Element not found or page took too long to load."
+    print(error_message)
+    send_email("Login Failure Alert", error_message)
 except Exception as e:
-    print(f"Unexpected error: {e}")
+    error_message = f"Unexpected error: {e}"
+    print(error_message)
+    send_email("Login Failure Alert", error_message)
 finally:
-    # Clean up by closing the browser
-    time.sleep(5)  # Optional delay before closing
     driver.quit()
     print("Browser closed")
