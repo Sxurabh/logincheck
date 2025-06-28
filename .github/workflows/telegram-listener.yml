@@ -29,6 +29,6 @@ jobs:
           GHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
           GHUB_OWNER:          ${{ github.repository_owner }}
           GHUB_REPO:           ${{ github.event.repository.name }}
-          GHUB_WORKFLOW_FILE:  'selenium-login.yml'
+          GHUB_WORKFLOW_FILE:  'selenium.yml'
           GHUB_REF:            'main'
         run: python .github/scripts/telegram_listener.py
