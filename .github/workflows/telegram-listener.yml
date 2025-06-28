@@ -26,7 +26,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN:    ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:      ${{ secrets.TELEGRAM_CHAT_ID }}
-          GHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          GHUB_TOKEN:          ${{ secrets.GHUB_TOKEN }}
           GHUB_OWNER:          ${{ github.repository_owner }}
           GHUB_REPO:           ${{ github.event.repository.name }}
           GHUB_WORKFLOW_FILE:  'selenium.yml'
