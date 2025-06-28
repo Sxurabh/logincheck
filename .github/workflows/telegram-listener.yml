@@ -31,4 +31,4 @@ jobs:
           GHUB_REPO:           ${{ github.event.repository.name }}
           GHUB_WORKFLOW_FILE:  'selenium.yml'
           GHUB_REF:            'main'
-        run: python .github/scripts/telegram_listener.py
+        run: python telegram_listener.py
