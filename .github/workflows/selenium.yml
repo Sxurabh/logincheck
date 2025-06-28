@@ -26,13 +26,12 @@ jobs:
       - name: 📦 Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install selenium webdriver-manager
+          pip install selenium webdriver-manager requests
 
       - name: ▶️ Run login script
         env:
-          LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
-          LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-          SENDER_EMAIL:   ${{ secrets.SENDER_EMAIL }}
-          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
-          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+          LOGIN_USERNAME:      ${{ secrets.LOGIN_USERNAME }}
+          LOGIN_PASSWORD:      ${{ secrets.LOGIN_PASSWORD }}
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python login_check.py

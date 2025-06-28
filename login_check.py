@@ -6,8 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-import smtplib
-from email.mime.text import MIMEText
+import requests
 import time
 import os
 
@@ -20,30 +19,29 @@ PASSWORD_FIELD_ID = "frm_dob"
 LOGIN_BUTTON_ID = "div_load"
 EXPECTED_URL = "https://www.himalayanuniversity.com/student/index.php"
 
-# Email configuration
-SENDER_EMAIL    = os.getenv("SENDER_EMAIL")
-SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
-RECEIVER_EMAIL  = os.getenv("RECEIVER_EMAIL")
-SMTP_SERVER     = "smtp.gmail.com"
-SMTP_PORT       = 587
+# Telegram configuration
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID  = os.getenv("TELEGRAM_CHAT_ID")
 
-def send_email(subject, body):
-    msg = MIMEText(body)
-    msg["Subject"] = subject
-    msg["From"]    = SENDER_EMAIL
-    msg["To"]      = RECEIVER_EMAIL
+def send_telegram(subject, message):
+    """Send a Telegram message."""
+    text = f"*{subject}*\n{message}"
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": text,
+        "parse_mode": "Markdown"
+    }
     try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, msg.as_string())
-        print(f"Email notification sent: {subject}")
+        resp = requests.post(url, data=payload, timeout=10)
+        resp.raise_for_status()
+        print("Telegram notification sent.")
     except Exception as e:
-        print(f"Failed to send email '{subject}': {e}")
+        print(f"Failed to send Telegram message: {e}")
 
 # --- Selenium setup ---
 options = Options()
-options.binary_location = "/usr/bin/chromium-browser"    # Ubuntu’s Chromium binary
+options.binary_location = "/usr/bin/chromium-browser"
 options.add_argument("--headless=new")
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
@@ -69,22 +67,22 @@ try:
 
     try:
         wait.until(EC.url_to_be(EXPECTED_URL))
-        success_msg = f"Login successful at {time.strftime('%Y-%m-%d %H:%M:%S')}"
+        success_msg = f"Login succeeded at {time.strftime('%Y-%m-%d %H:%M:%S')}"
         print(success_msg)
-        send_email("✅ Login Success", success_msg)
+        send_telegram("✅ Login Success", success_msg)
     except TimeoutException:
-        error_message = "Login failed: did not redirect to the expected URL in time."
-        print(error_message)
-        send_email("⚠️ Login Failure", error_message)
+        error_msg = "Login failed: did not redirect to the expected URL in time."
+        print(error_msg)
+        send_telegram("⚠️ Login Failure", error_msg)
 
 except TimeoutException:
-    error_message = "Timeout: Element not found or page too slow."
-    print(error_message)
-    send_email("⚠️ Login Failure", error_message)
+    error_msg = "Timeout: Element not found or page too slow."
+    print(error_msg)
+    send_telegram("⚠️ Login Failure", error_msg)
 except Exception as e:
-    error_message = f"Unexpected error: {e}"
-    print(error_message)
-    send_email("⚠️ Login Failure", error_message)
+    error_msg = f"Unexpected error: {e}"
+    print(error_msg)
+    send_telegram("⚠️ Login Failure", error_msg)
 finally:
     driver.quit()
     print("Browser closed")
