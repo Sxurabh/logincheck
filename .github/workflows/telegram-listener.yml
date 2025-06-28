@@ -3,7 +3,7 @@ name: 🤖 Telegram → GitHub Action
 on:
   schedule:
     # Every 5 minutes (GitHub’s minimum)
-    - cron: '*/5 * * * *'
+    - cron: '*/1 * * * *'
   workflow_dispatch:
 
 jobs:
