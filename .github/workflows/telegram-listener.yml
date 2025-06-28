@@ -26,9 +26,9 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN:    ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:      ${{ secrets.TELEGRAM_CHAT_ID }}
-          GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER:          ${{ github.repository_owner }}
-          GITHUB_REPO:           ${{ github.event.repository.name }}
-          GITHUB_WORKFLOW_FILE:  'selenium-login.yml'
-          GITHUB_REF:            'main'
+          GHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          GHUB_OWNER:          ${{ github.repository_owner }}
+          GHUB_REPO:           ${{ github.event.repository.name }}
+          GHUB_WORKFLOW_FILE:  'selenium-login.yml'
+          GHUB_REF:            'main'
         run: python .github/scripts/telegram_listener.py

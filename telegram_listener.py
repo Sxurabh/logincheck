@@ -4,11 +4,11 @@ import os, requests, time
 # ─── Configuration ─────────────────────────────────────────────────────────────
 BOT_TOKEN        = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID          = int(os.getenv("TELEGRAM_CHAT_ID"))
-GITHUB_TOKEN     = os.getenv("GITHUB_TOKEN")
-OWNER            = os.getenv("GITHUB_OWNER")
-REPO             = os.getenv("GITHUB_REPO")
-WORKFLOW_FILE    = os.getenv("GITHUB_WORKFLOW_FILE")  # e.g. "selenium-login.yml"
-REF              = os.getenv("GITHUB_REF", "main")
+GITHUB_TOKEN     = os.getenv("GHUB_TOKEN")
+OWNER            = os.getenv("GHUB_OWNER")
+REPO             = os.getenv("GHUB_REPO")
+WORKFLOW_FILE    = os.getenv("GHUB_WORKFLOW_FILE")  # e.g. "selenium-login.yml"
+REF              = os.getenv("GHUB_REF", "main")
 
 TELE_GET_UPDATES = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
 GH_DISPATCH_URL  = (
@@ -23,7 +23,7 @@ def get_updates():
 
 def trigger_workflow():
     headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
+        "Authorization": f"token {GHUB_TOKEN}",
         "Accept":        "application/vnd.github.v3+json"
     }
     payload = {"ref": REF}
