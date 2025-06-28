@@ -1,6 +1,11 @@
 name: 🖥️ Run Selenium Login Script
 
 on:
+  schedule:
+    # 10:00 Asia/Kolkata ➔ 04:30 UTC
+    - cron: '30 4 * * *'
+    # 21:00 Asia/Kolkata ➔ 15:30 UTC
+    - cron: '30 15 * * *'
   push:
     branches: [ main ]
   workflow_dispatch:
@@ -30,8 +35,8 @@ jobs:
 
       - name: ▶️ Run login script
         env:
-          LOGIN_USERNAME:      ${{ secrets.LOGIN_USERNAME }}
-          LOGIN_PASSWORD:      ${{ secrets.LOGIN_PASSWORD }}
-          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
+          LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python login_check.py
