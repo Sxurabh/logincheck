@@ -4,7 +4,7 @@ import os, requests, time
 # ─── Configuration ─────────────────────────────────────────────────────────────
 BOT_TOKEN        = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID          = int(os.getenv("TELEGRAM_CHAT_ID"))
-GITHUB_TOKEN     = os.getenv("GHUB_TOKEN")
+GHUB_TOKEN     = os.getenv("GHUB_TOKEN")
 OWNER            = os.getenv("GHUB_OWNER")
 REPO             = os.getenv("GHUB_REPO")
 WORKFLOW_FILE    = os.getenv("GHUB_WORKFLOW_FILE")  # e.g. "selenium-login.yml"
