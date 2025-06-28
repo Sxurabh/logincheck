@@ -36,9 +36,9 @@ def send_email(subject, body):
             server.starttls()
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, msg.as_string())
-        print("Email notification sent successfully.")
+        print(f"Email notification sent successfully: {subject}")
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        print(f"Failed to send email '{subject}': {e}")
 
 # Set up Chrome options for headless mode
 options = Options()
@@ -73,20 +73,22 @@ try:
     # Verify successful login by checking the URL
     try:
         wait.until(EC.url_to_be(EXPECTED_URL))
-        print("Login successful!")
+        success_msg = f"Login successful at {time.strftime('%Y-%m-%d %H:%M:%S')}"
+        print(success_msg)
+        send_email("✅ Login Success", success_msg)
     except TimeoutException:
         error_message = "Login failed: did not redirect to the expected URL within the time limit."
         print(error_message)
-        send_email("Login Failure Alert", error_message)
+        send_email("⚠️ Login Failure Alert", error_message)
 
 except TimeoutException:
     error_message = "Timeout: Element not found or page took too long to load."
     print(error_message)
-    send_email("Login Failure Alert", error_message)
+    send_email("⚠️ Login Failure Alert", error_message)
 except Exception as e:
     error_message = f"Unexpected error: {e}"
     print(error_message)
-    send_email("Login Failure Alert", error_message)
+    send_email("⚠️ Login Failure Alert", error_message)
 finally:
     driver.quit()
     print("Browser closed")
