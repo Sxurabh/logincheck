@@ -13,7 +13,7 @@ import os
 # Configuration variables
 LOGIN_URL = "https://www.himalayanuniversity.com/student/student_login.php"
 USERNAME = os.getenv("LOGIN_USERNAME")
-PASSWORD = os.getenv("LOGIN_PASSWORD")
+PASSWORD = os.getenv("LOGIN_PASSWORD") 
 USERNAME_FIELD_ID = "frm_registration_no"
 PASSWORD_FIELD_ID = "frm_dob"
 LOGIN_BUTTON_ID = "div_load"
