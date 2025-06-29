@@ -2,10 +2,8 @@ name: 🖥️ Run Selenium Login Script
 
 on:
   schedule:
-    # 10:00 Asia/Kolkata ➔ 04:30 UTC
-    - cron: '30 4 * * *'
-    # 21:00 Asia/Kolkata ➔ 15:30 UTC
-    - cron: '30 15 * * *'
+    - cron: '30 4 * * *'    # 10:00 IST ➔ 04:30 UTC
+    - cron: '30 15 * * *'   # 21:00 IST ➔ 15:30 UTC
   push:
     branches: [ main ]
   workflow_dispatch:
@@ -34,9 +32,24 @@ jobs:
           pip install selenium webdriver-manager requests
 
       - name: ▶️ Run login script
+        id: check
         env:
           LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
           LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python login_check.py
+        run: |
+          output=$(python login_check.py)
+          echo "$output"
+          echo "::set-output name=status::$output"
+          if [ $? -ne 0 ]; then exit 1; fi
+
+      - name: Publish Login Check Result
+        uses: peter-evans/create-check@v2
+        with:
+          name: Login Check
+          head_sha: ${{ github.sha }}
+          conclusion: ${{ job.status }}
+          output: |
+            title: Login Check Details
+            summary: ${{ steps.check.outputs.status }}
