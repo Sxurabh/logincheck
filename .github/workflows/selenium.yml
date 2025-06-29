@@ -1,5 +1,9 @@
-# .github/workflows/selenium.yml
 name: 🖥️ Run Selenium Login Script
+
+permissions:
+  contents: read         # for actions/checkout
+  checks: write          # to create Check Runs via GITHUB_TOKEN
+  actions: write         # to dispatch workflows
 
 on:
   schedule:
@@ -46,7 +50,6 @@ jobs:
           output=$(python login_check.py)
           echo "$output"
           echo "::set-output name=status::$output"
-          # Exit with non-zero if the script failed, so checks.create gets the right conclusion
           if [ $? -ne 0 ]; then exit 1; fi
 
       - name: Publish Login Check as a GitHub Check Run
