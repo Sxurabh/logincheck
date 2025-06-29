@@ -1,15 +1,11 @@
+# .github/workflows/selenium.yml
 name: 🖥️ Run Selenium Login Script
-
-permissions:
-  contents: read         # for actions/checkout
-  checks: write          # to create Check Runs via GITHUB_TOKEN
-  actions: write         # to dispatch workflows
 
 on:
   schedule:
-    # 10:00 Asia/Kolkata ➔ 04:30 UTC
+    # 10:00 IST ➔ 04:30 UTC
     - cron: '30 4 * * *'
-    # 21:00 Asia/Kolkata ➔ 15:30 UTC
+    # 21:00 IST ➔ 15:30 UTC
     - cron: '30 15 * * *'
   push:
     branches: [ main ]
@@ -39,36 +35,9 @@ jobs:
           pip install selenium webdriver-manager requests
 
       - name: ▶️ Run login script
-        id: check
-        continue-on-error: true
         env:
           LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
           LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          output=$(python login_check.py)
-          echo "$output"
-          echo "::set-output name=status::$output"
-          if [ $? -ne 0 ]; then exit 1; fi
-
-      - name: Publish Login Check as a GitHub Check Run
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GHUB_TOKEN }}
-          script: |
-            const log   = `${{ steps.check.outputs.status }}`;
-            const concl = `${{ steps.check.outcome }}`;
-            await github.rest.checks.create({
-              owner:      context.repo.owner,
-              repo:       context.repo.repo,
-              name:       'Login Check',
-              head_sha:   context.sha,
-              status:     'completed',
-              conclusion: concl,
-              output: {
-                title:   'Login Check Details',
-                summary: log
-              }
-            });
+        run: python login_check.py
