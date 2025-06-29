@@ -1,9 +1,12 @@
+# .github/workflows/selenium.yml
 name: 🖥️ Run Selenium Login Script
 
 on:
   schedule:
-    - cron: '30 4 * * *'    # 10:00 IST ➔ 04:30 UTC
-    - cron: '30 15 * * *'   # 21:00 IST ➔ 15:30 UTC
+    # 10:00 Asia/Kolkata ➔ 04:30 UTC
+    - cron: '30 4 * * *'
+    # 21:00 Asia/Kolkata ➔ 15:30 UTC
+    - cron: '30 15 * * *'
   push:
     branches: [ main ]
   workflow_dispatch:
@@ -33,6 +36,7 @@ jobs:
 
       - name: ▶️ Run login script
         id: check
+        continue-on-error: true
         env:
           LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
           LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
@@ -42,14 +46,26 @@ jobs:
           output=$(python login_check.py)
           echo "$output"
           echo "::set-output name=status::$output"
+          # Exit with non-zero if the script failed, so checks.create gets the right conclusion
           if [ $? -ne 0 ]; then exit 1; fi
 
-      - name: Publish Login Check Result
-        uses: peter-evans/create-check@v2
+      - name: Publish Login Check as a GitHub Check Run
+        if: always()
+        uses: actions/github-script@v6
         with:
-          name: Login Check
-          head_sha: ${{ github.sha }}
-          conclusion: ${{ job.status }}
-          output: |
-            title: Login Check Details
-            summary: ${{ steps.check.outputs.status }}
+          github-token: ${{ secrets.GHUB_TOKEN }}
+          script: |
+            const log   = `${{ steps.check.outputs.status }}`;
+            const concl = `${{ steps.check.outcome }}`;
+            await github.rest.checks.create({
+              owner:      context.repo.owner,
+              repo:       context.repo.repo,
+              name:       'Login Check',
+              head_sha:   context.sha,
+              status:     'completed',
+              conclusion: concl,
+              output: {
+                title:   'Login Check Details',
+                summary: log
+              }
+            });
