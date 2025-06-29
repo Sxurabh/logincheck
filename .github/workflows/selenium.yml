@@ -1,11 +1,13 @@
-# .github/workflows/selenium.yml
 name: 🖥️ Run Selenium Login Script
+
+permissions:
+  contents: read     # for checkout
+  actions: write     # to dispatch workflows
+  gists: write       # to update your status gist
 
 on:
   schedule:
-    # 10:00 IST ➔ 04:30 UTC
     - cron: '30 4 * * *'
-    # 21:00 IST ➔ 15:30 UTC
     - cron: '30 15 * * *'
   push:
     branches: [ main ]
@@ -35,9 +37,34 @@ jobs:
           pip install selenium webdriver-manager requests
 
       - name: ▶️ Run login script
+        id: check
+        continue-on-error: true
         env:
           LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
           LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python login_check.py
+        run: |
+          output=$(python login_check.py)
+          echo "$output"
+          echo "::set-output name=status::$output"
+          if [ $? -ne 0 ]; then exit 1; fi
+
+      - name: 📝 Update Login Status Gist
+        if: always()
+        uses: actions/github-script@v6
+        env:
+          GIST_ID: ${{ secrets.GIST_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const logOutput = `${{ steps.check.outputs.status }}`.trim()
+            const now = new Date().toISOString()
+            await github.gists.update({
+              gist_id: process.env.GIST_ID,
+              files: {
+                'login-status.json': {
+                  content: JSON.stringify({ status: logOutput, time: now })
+                }
+              }
+            })
