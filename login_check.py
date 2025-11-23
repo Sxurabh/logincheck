@@ -50,16 +50,32 @@ def check_single_login(username, password, label):
     
     options = Options()
     options.binary_location = "/usr/bin/chromium-browser"
-    options.add_argument("--headless=new")
+    options.add_argument("--headless=new") 
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    # Remove remote-debugging-port to avoid conflicts in loops/parallel runs
-    # options.add_argument("--remote-debugging-port=9222") 
+    
+    # -----------------------------------------------------
+    # FIX: Restore this line. It is required for GitHub Actions.
+    options.add_argument("--remote-debugging-port=9222")
+    # -----------------------------------------------------
+
+    # Optional: these often help with stability in CI
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-software-rasterizer")
 
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    wait = WebDriverWait(driver, 15) # Increased timeout slightly
+    
+    # Initialize driver
+    try:
+        driver = webdriver.Chrome(service=service, options=options)
+    except Exception as e:
+        print(f"❌ Failed to initialize Driver for {label}: {e}")
+        # Return False immediately if driver fails to start
+        return False
+
+    wait = WebDriverWait(driver, 15)
 
     status = "Failed"
     try:
