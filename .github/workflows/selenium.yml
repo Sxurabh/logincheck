@@ -36,8 +36,22 @@ jobs:
 
       - name: ▶️ Run login script
         env:
-          LOGIN_USERNAME:     ${{ secrets.LOGIN_USERNAME }}
-          LOGIN_PASSWORD:     ${{ secrets.LOGIN_PASSWORD }}
+          # Account 1 Credentials
+          LOGIN_USERNAME_1: ${{ secrets.LOGIN_USERNAME_1 }}
+          LOGIN_PASSWORD_1: ${{ secrets.LOGIN_PASSWORD_1 }}
+          LOGIN_LABEL_1:    "Main Account" # Custom Status Msg Label
+
+          # Account 2 Credentials
+          LOGIN_USERNAME_2: ${{ secrets.LOGIN_USERNAME_2 }}
+          LOGIN_PASSWORD_2: ${{ secrets.LOGIN_PASSWORD_2 }}
+          LOGIN_LABEL_2:    "Student ID 2"
+
+          # Account 3 Credentials
+          LOGIN_USERNAME_3: ${{ secrets.LOGIN_USERNAME_3 }}
+          LOGIN_PASSWORD_3: ${{ secrets.LOGIN_PASSWORD_3 }}
+          LOGIN_LABEL_3:    "Student ID 3"
+
+          # Common Config
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python login_check.py
